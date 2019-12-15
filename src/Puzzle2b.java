@@ -1,13 +1,10 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Puzzle2b {
   public static void main(String[] args) {
-    Scanner sc = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
+    Scanner sc = new Scanner(System.in);
     String program = sc.nextLine();
     String[] pieces = program.split(",");
     int[] memory = Stream.of(pieces).mapToInt(Integer::parseInt).toArray();
@@ -17,8 +14,8 @@ public class Puzzle2b {
         memory[1] = noun;
         memory[2] = verb;
         Intcode computer = new Intcode(memory);
-        Optional<int[]> output = computer.execute();
-        if (output.isPresent() && output.get()[0] == 19690720) {
+        int[] output = computer.execute();
+        if (output[0] == 19690720) {
           System.out.println(100 * noun + verb);
           System.exit(0);
         }
