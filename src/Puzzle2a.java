@@ -1,5 +1,5 @@
 import java.util.Scanner;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 public class Puzzle2a {
@@ -11,9 +11,9 @@ public class Puzzle2a {
     memory[1] = 12;
     memory[2] = 2;
     Intcode computer = new Intcode(memory);
-    int[] output = computer.execute();
+    long[] output = computer.execute();
     String finalState = 
-        IntStream.of(output)
+        LongStream.of(output)
             .collect(
                 StringBuilder::new,
                 (collect, value) -> collect.append(",").append(value),

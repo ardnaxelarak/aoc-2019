@@ -1,5 +1,4 @@
 import java.util.Scanner;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Puzzle2b {
@@ -14,7 +13,7 @@ public class Puzzle2b {
         memory[1] = noun;
         memory[2] = verb;
         Intcode computer = new Intcode(memory);
-        int[] output = computer.execute();
+        long[] output = computer.execute();
         if (output[0] == 19690720) {
           System.out.println(100 * noun + verb);
           System.exit(0);

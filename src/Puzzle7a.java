@@ -16,14 +16,14 @@ public class Puzzle7a {
     System.out.println(emit.getMaxThrust());
   }
 
-  private static int getThruster(int[] memory, int[] settings) {
+  private static long getThruster(int[] memory, int[] settings) {
     if (settings.length != 5) {
       throw new IllegalArgumentException(
           "Expected 5 phase settings but got " + settings.length);
     }
 
     Intcode computer = new Intcode(memory);
-    int lastvalue = 0;
+    long lastvalue = 0;
     for (int i = 0; i < 5; i++) {
       ArrayIO amplifier = new ArrayIO(false, settings[i], lastvalue);
       new Intcode(memory).execute(amplifier);
@@ -34,7 +34,7 @@ public class Puzzle7a {
 
   private static class P7aEmitter implements Permutations.PermutationEmitter<Integer> {
     private int[] memory;
-    private int maxThrust = Integer.MIN_VALUE;
+    private long maxThrust = Long.MIN_VALUE;
 
     public P7aEmitter(int[] memory) {
       this.memory = memory;
@@ -42,13 +42,13 @@ public class Puzzle7a {
 
     public void emit(Integer[] array) {
       int[] prim = Stream.of(array).mapToInt(Integer::intValue).toArray();
-      int thrust = getThruster(memory, prim);
+      long thrust = getThruster(memory, prim);
       if (thrust > maxThrust) {
         maxThrust = thrust;
       }
     }
 
-    public int getMaxThrust() {
+    public long getMaxThrust() {
       return maxThrust;
     }
   }

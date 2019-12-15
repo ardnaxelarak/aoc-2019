@@ -1,15 +1,15 @@
 public class ArrayIO implements IntcodeIO {
   private int index = 0;
-  private int[] inputs;
-  private int lastRead = 0;
+  private long[] inputs;
+  private long lastRead = 0;
   private boolean dispOutput;
 
-  public ArrayIO(boolean dispOutput, int... inputs) {
+  public ArrayIO(boolean dispOutput, long... inputs) {
     this.inputs = inputs;
     this.dispOutput = dispOutput;
   }
 
-  public int input() {
+  public long input() {
     if (index >= inputs.length) {
       throw new IllegalStateException("No more input!");
     } else {
@@ -17,14 +17,14 @@ public class ArrayIO implements IntcodeIO {
     }
   }
 
-  public void output(int value) {
+  public void output(long value) {
     if (dispOutput) {
       System.err.printf("Output: %d\n", value);
     }
     lastRead = value;
   }
 
-  public int getLastOutput() {
+  public long getLastOutput() {
     return lastRead;
   }
 }

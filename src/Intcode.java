@@ -4,31 +4,36 @@ import java.util.Optional;
 public class Intcode {
   private static final boolean DEBUG = false;
   private static final IntcodeIO DEFAULT_IO = new IntcodeIO() {
-    public int input() {
+    public long input() {
       throw new IllegalStateException("No implementation of input!");
     }
 
-    public void output(int value) {
+    public void output(long value) {
       System.err.printf("Output: %d\n", value);
     }
   };
 
-  private int[] memory;
+  private long[] memory;
+  private int relativeBase;
 
   public Intcode(int[] memory) {
-    this.memory = Arrays.copyOf(memory, memory.length);
+    this(Arrays.stream(memory).asLongStream().toArray());
   }
 
-  public int[] execute() {
+  public Intcode(long[] memory) {
+    this.memory = Arrays.copyOf(memory, memory.length * 10);
+  }
+
+  public long[] execute() {
     return execute(DEFAULT_IO);
   }
 
-  public int[] execute(IntcodeIO io) {
+  public long[] execute(IntcodeIO io) {
     int index = 0;
-    int p1, p2;
-    int code;
+    long p1, p2;
+    long code;
     while ((code = memory[index]) % 100 != 99) {
-      switch (code % 100) {
+      switch ((int) (code % 100)) {
         case 1:
           debug(code, index, 3);
           p1 = readValue(code, index, 1);
@@ -56,7 +61,7 @@ public class Intcode {
         case 5:
           debug(code, index, 2);
           if (readValue(code, index, 1) != 0) {
-            index = readValue(code, index, 2);
+            index = (int) readValue(code, index, 2);
           } else {
             index += 3;
           }
@@ -64,7 +69,7 @@ public class Intcode {
         case 6:
           debug(code, index, 2);
           if (readValue(code, index, 1) == 0) {
-            index = readValue(code, index, 2);
+            index = (int) readValue(code, index, 2);
           } else {
             index += 3;
           }
@@ -83,6 +88,11 @@ public class Intcode {
           storeValue(code, index, 3, p1 == p2 ? 1 : 0);
           index += 4;
           break;
+        case 9:
+          debug(code, index, 1);
+          relativeBase += readValue(code, index, 1);
+          index += 2;
+          break;
         default:
           throw new IllegalStateException("Unexpected instruction: " + code % 100);
       }
@@ -90,7 +100,7 @@ public class Intcode {
     return Arrays.copyOf(memory, memory.length);
   }
 
-  private void debug(int code, int index, int params) {
+  private void debug(long code, int index, int params) {
     if (!DEBUG) {
       return;
     }
@@ -101,41 +111,46 @@ public class Intcode {
     System.err.println();
   }
 
-  private int readValue(int code, int index, int argnum) {
+  private long readValue(long code, int index, int argnum) {
     int mode = getParameterMode(code, argnum);
 
-    int parameter = memory[index + argnum];
+    long parameter = memory[index + argnum];
     switch (mode) {
       case 0:
-        return memory[parameter];
+        return memory[(int) parameter];
       case 1:
         return parameter;
+      case 2:
+        return memory[(int) (relativeBase + parameter)];
       default:
         throw new IllegalArgumentException("Unexpected parameter mode: " + mode);
     }
   }
 
-  private void storeValue(int code, int index, int argnum, int value) {
+  private void storeValue(long code, int index, int argnum, long value) {
     int mode = getParameterMode(code, argnum);
 
-    int parameter = memory[index + argnum];
+    long parameter = memory[index + argnum];
     switch (mode) {
       case 0:
-        memory[parameter] = value;
+        memory[(int) parameter] = value;
         break;
       case 1:
         throw new IllegalArgumentException("Cannot store value in immediate mode");
+      case 2:
+        memory[(int) (relativeBase + parameter)] = value;
+        break;
       default:
         throw new IllegalArgumentException("Unexpected parameter mode: " + mode);
     }
   }
 
-  private int getParameterMode(int code, int argnum) {
-    int mode = code / 100;
+  private int getParameterMode(long code, int argnum) {
+    long mode = code / 100;
     for (int i = 1; i < argnum; i++) {
       mode /= 10;
     }
     mode = mode % 10;
-    return mode;
+    return (int) mode;
   }
 }

@@ -1,5 +1,5 @@
 public interface IntcodeIO {
-  int input();
+  long input();
 
-  void output(int value);
+  void output(long value);
 }

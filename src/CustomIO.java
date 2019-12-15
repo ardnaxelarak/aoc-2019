@@ -3,12 +3,12 @@ import java.util.List;
 
 public class CustomIO implements IntcodeIO {
   private CustomIO after = null;
-  private int[] initialInputs;
+  private long[] initialInputs;
   private int index = 0;
-  private List<Integer> buffer = new ArrayList<>();
-  private int lastValue;
+  private List<Long> buffer = new ArrayList<>();
+  private long lastValue;
 
-  public CustomIO(int... inputs) {
+  public CustomIO(long... inputs) {
     this.initialInputs = inputs;
   }
 
@@ -16,7 +16,7 @@ public class CustomIO implements IntcodeIO {
     this.after = after;
   }
 
-  public int input() {
+  public long input() {
     synchronized (this) {
       if (index < initialInputs.length) {
         return initialInputs[index++];
@@ -34,21 +34,21 @@ public class CustomIO implements IntcodeIO {
     }
   }
 
-  public void output(int value) {
+  public void output(long value) {
     if (after != null) {
       after.addInput(value);
     }
     lastValue = value;
   }
 
-  public void addInput(int value) {
+  public void addInput(long value) {
     synchronized (this) {
       buffer.add(value);
       this.notify();
     }
   }
 
-  public int getLastOutput() {
+  public long getLastOutput() {
     return lastValue;
   }
 }

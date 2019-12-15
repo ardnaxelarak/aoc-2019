@@ -16,7 +16,7 @@ public class Puzzle7b {
     System.out.println(emit.getMaxThrust());
   }
 
-  private static int getThruster(int[] memory, int[] settings) throws InterruptedException {
+  private static long getThruster(int[] memory, int[] settings) throws InterruptedException {
     if (settings.length != 5) {
       throw new IllegalArgumentException(
           "Expected 5 phase settings but got " + settings.length);
@@ -49,7 +49,7 @@ public class Puzzle7b {
 
   private static class P7bEmitter implements Permutations.PermutationEmitter<Integer> {
     private int[] memory;
-    private int maxThrust = Integer.MIN_VALUE;
+    private long maxThrust = Long.MIN_VALUE;
 
     public P7bEmitter(int[] memory) {
       this.memory = memory;
@@ -58,7 +58,7 @@ public class Puzzle7b {
     public void emit(Integer[] array) {
       int[] prim = Stream.of(array).mapToInt(Integer::intValue).toArray();
       try {
-        int thrust = getThruster(memory, prim);
+        long thrust = getThruster(memory, prim);
         if (thrust > maxThrust) {
           maxThrust = thrust;
         }
@@ -67,7 +67,7 @@ public class Puzzle7b {
       }
     }
 
-    public int getMaxThrust() {
+    public long getMaxThrust() {
       return maxThrust;
     }
   }
