@@ -30,44 +30,75 @@ public class Intcode {
     while ((code = memory[index]) % 100 != 99) {
       switch (code % 100) {
         case 1:
-          if (DEBUG) {
-            System.err.printf(
-                "%d %d %d %d\n", code, memory[index + 1], memory[index + 2], memory[index + 3]);
-          }
+          debug(code, index, 3);
           p1 = readValue(code, index, 1);
           p2 = readValue(code, index, 2);
           storeValue(code, index, 3, p1 + p2);
           index += 4;
           break;
         case 2:
-          if (DEBUG) {
-            System.err.printf(
-                "%d %d %d %d\n", code, memory[index + 1], memory[index + 2], memory[index + 3]);
-          }
+          debug(code, index, 3);
           p1 = readValue(code, index, 1);
           p2 = readValue(code, index, 2);
           storeValue(code, index, 3, p1 * p2);
           index += 4;
           break;
         case 3:
-          if (DEBUG) {
-            System.err.printf("%d %d\n", code, memory[index + 1]);
-          }
+          debug(code, index, 1);
           storeValue(code, index, 1, io.input());
           index += 2;
           break;
         case 4:
-          if (DEBUG) {
-            System.err.printf("%d %d\n", code, memory[index + 1]);
-          }
+          debug(code, index, 1);
           io.output(readValue(code, index, 1));
           index += 2;
+          break;
+        case 5:
+          debug(code, index, 2);
+          if (readValue(code, index, 1) != 0) {
+            index = readValue(code, index, 2);
+          } else {
+            index += 3;
+          }
+          break;
+        case 6:
+          debug(code, index, 2);
+          if (readValue(code, index, 1) == 0) {
+            index = readValue(code, index, 2);
+          } else {
+            index += 3;
+          }
+          break;
+        case 7:
+          debug(code, index, 3);
+          p1 = readValue(code, index, 1);
+          p2 = readValue(code, index, 2);
+          storeValue(code, index, 3, p1 < p2 ? 1 : 0);
+          index += 4;
+          break;
+        case 8:
+          debug(code, index, 3);
+          p1 = readValue(code, index, 1);
+          p2 = readValue(code, index, 2);
+          storeValue(code, index, 3, p1 == p2 ? 1 : 0);
+          index += 4;
           break;
         default:
           throw new IllegalStateException("Unexpected instruction: " + code % 100);
       }
     }
     return Arrays.copyOf(memory, memory.length);
+  }
+
+  private void debug(int code, int index, int params) {
+    if (!DEBUG) {
+      return;
+    }
+    System.err.print(code);
+    for (int i = 1; i <= params; i++) {
+      System.err.printf(" %d", memory[index + i]);
+    }
+    System.err.println();
   }
 
   private int readValue(int code, int index, int argnum) {
