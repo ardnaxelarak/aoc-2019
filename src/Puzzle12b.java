@@ -25,33 +25,28 @@ public class Puzzle12b {
       }
     }
 
-    int maxOffset = 0;
     long lcm = 1;
     for (int dim = 0; dim < 3; dim++) {
-      List<WorldSlice> states = new ArrayList<>();
-      WorldSlice last = slices[dim];
-      states.add(last);
+      int steps = 0;
+      WorldSlice initial = slices[dim];
+      WorldSlice last = initial;
       WorldSlice next;
       while (true) {
-        if (states.size() % 10000 == 0) {
-          System.err.printf("Dimension %d: Checked %d states\n", dim, states.size());
+        steps++;
+        if (steps % 10000 == 0) {
+          System.err.printf("Dimension %d: Checked %d states\n", dim, steps);
         }
         next = last.step();
-        int index = states.indexOf(next);
-        if (index < 0) {
-          states.add(next);
-          last = next;
-        } else {
-          maxOffset = Math.max(maxOffset, index);
-          int len = states.size() - index;
-          System.err.printf("Dimension %d: offset = %d, len = %d\n", dim, index, len);
-          lcm = lcm(lcm, len);
+        if (next.equals(initial)) {
+          System.err.printf("Dimension %d: len = %d\n", dim, steps);
+          lcm = lcm(lcm, steps);
           break;
         }
+        last = next;
       }
     }
 
-    System.out.println(maxOffset + lcm);
+    System.out.println(lcm);
   }
 
   private static long lcm(long a, long b) {
