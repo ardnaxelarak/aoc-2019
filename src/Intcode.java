@@ -19,11 +19,7 @@ public class Intcode {
   private long[] originalMemory;
   private int relativeBase;
 
-  public Intcode(int[] memory) {
-    this(Arrays.stream(memory).asLongStream().toArray());
-  }
-
-  public Intcode(long[] memory) {
+  private Intcode(long[] memory) {
     this.originalMemory = Arrays.copyOf(memory, memory.length * 10);
   }
 
