@@ -16,7 +16,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Puzzle18a2 {
+public class Puzzle18a {
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
     List<String> inputs = new ArrayList<>();
@@ -26,7 +26,7 @@ public class Puzzle18a2 {
 
     int[][] map =
         inputs.stream()
-            .map(line -> line.chars().map(Puzzle18a2::getValue).toArray())
+            .map(line -> line.chars().map(Puzzle18a::getValue).toArray())
             .toArray(int[][]::new);
 
     Table<Integer, Integer, Integer> distances = getDistances(map);
