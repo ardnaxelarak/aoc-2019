@@ -16,6 +16,7 @@ public class Intcode {
   };
 
   private long[] memory;
+  private long[] originalMemory;
   private int relativeBase;
 
   public Intcode(int[] memory) {
@@ -23,7 +24,7 @@ public class Intcode {
   }
 
   public Intcode(long[] memory) {
-    this.memory = Arrays.copyOf(memory, memory.length * 10);
+    this.originalMemory = Arrays.copyOf(memory, memory.length * 10);
   }
 
   public static Intcode fromStdIn() {
@@ -39,6 +40,9 @@ public class Intcode {
   }
 
   public long[] execute(IntcodeIO io) {
+    this.memory = Arrays.copyOf(originalMemory, originalMemory.length);
+    this.relativeBase = 0;
+
     int index = 0;
     long p1, p2;
     long code;
