@@ -64,23 +64,6 @@ public class Puzzle18a {
     }
   }
 
-  private static class Point {
-    private int x, y;
-
-    public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    public int getX() {
-      return x;
-    }
-
-    public int getY() {
-      return y;
-    }
-  }
-
   public static class Area {
     private int[][] map;
     private int distance;
@@ -117,7 +100,7 @@ public class Puzzle18a {
       int dx = dest.getX();
       int dy = dest.getY();
 
-      Point cur = new Point(curX, curY);
+      Point cur = Point.create(curX, curY);
       int[][] dist = new int[map.length][map[0].length];
       for (int y = 0; y < dist.length; y++) {
         Arrays.fill(dist[y], Integer.MAX_VALUE);
@@ -136,28 +119,28 @@ public class Puzzle18a {
           if (cy == dy && cx - 1 == dx) {
             return Optional.of(craft(map, dist[cy][cx - 1], cx - 1, cy, target));
           }
-          queue.add(new Point(cx - 1, cy));
+          queue.add(Point.create(cx - 1, cy));
         }
         if (check(map, dist, cx + 1, cy, target)) {
           dist[cy][cx + 1] = dist[cy][cx] + 1;
           if (cy == dy && cx + 1 == dx) {
             return Optional.of(craft(map, dist[cy][cx + 1], cx + 1, cy, target));
           }
-          queue.add(new Point(cx + 1, cy));
+          queue.add(Point.create(cx + 1, cy));
         }
         if (check(map, dist, cx, cy - 1, target)) {
           dist[cy - 1][cx] = dist[cy][cx] + 1;
           if (cy - 1 == dy && cx == dx) {
             return Optional.of(craft(map, dist[cy - 1][cx], cx, cy - 1, target));
           }
-          queue.add(new Point(cx, cy - 1));
+          queue.add(Point.create(cx, cy - 1));
         }
         if (check(map, dist, cx, cy + 1, target)) {
           dist[cy + 1][cx] = dist[cy][cx] + 1;
           if (cy + 1 == dy && cx == dx) {
             return Optional.of(craft(map, dist[cy + 1][cx], cx, cy + 1, target));
           }
-          queue.add(new Point(cx, cy + 1));
+          queue.add(Point.create(cx, cy + 1));
         }
       }
 
@@ -203,7 +186,7 @@ public class Puzzle18a {
     for (int y = 0; y < map.length; y++) {
       for (int x = 0; x < map[y].length; x++) {
         if (map[y][x] == target) {
-          return new Point(x, y);
+          return Point.create(x, y);
         }
       }
     }

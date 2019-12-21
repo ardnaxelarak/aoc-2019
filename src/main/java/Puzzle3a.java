@@ -1,15 +1,13 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Puzzle3a {
   public static void main(String[] args) {
-    Scanner sc = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
+    Scanner sc = new Scanner(System.in);
     String wire1 = sc.nextLine();
     String wire2 = sc.nextLine();
-    Point origin = new Point(0, 0);
+    Point origin = Point.create(0, 0);
 
     List<WireLine> lines1 = new ArrayList<>();
     String[] pieces1 = wire1.split(",");
@@ -37,31 +35,14 @@ public class Puzzle3a {
       if (p.getX() == 0 && p.getY() == 0) {
         continue;
       }
-      mindist = Math.min(p.dist(origin), mindist);
+      mindist = Math.min(dist(p, origin), mindist);
     }
 
     System.out.println(mindist);
   }
 
-  private static class Point {
-    private int x, y;
-
-    public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    public int getX() {
-      return x;
-    }
-
-    public int getY() {
-      return y;
-    }
-
-    public int dist(Point other) {
-      return Math.abs(other.x - x) + Math.abs(other.y - y);
-    }
+  private static int dist(Point a, Point b) {
+    return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
   }
 
   private static class WireLine {
@@ -80,16 +61,16 @@ public class Puzzle3a {
       switch (dir.charAt(0)) {
         case 'L':
           list.add(new WireLine(x1 - dist, y1, x1, y1));
-          return new Point(x1 - dist, y1);
+          return Point.create(x1 - dist, y1);
         case 'R':
           list.add(new WireLine(x1, y1, x1 + dist, y1));
-          return new Point(x1 + dist, y1);
+          return Point.create(x1 + dist, y1);
         case 'U':
           list.add(new WireLine(x1, y1, x1, y1 + dist));
-          return new Point(x1, y1 + dist);
+          return Point.create(x1, y1 + dist);
         case 'D':
           list.add(new WireLine(x1, y1 - dist, x1, y1));
-          return new Point(x1, y1 - dist);
+          return Point.create(x1, y1 - dist);
         default:
           throw new IllegalArgumentException();
       }
@@ -104,13 +85,13 @@ public class Puzzle3a {
         // other is vertical
         if (y2 == y1) {
           // this is horizontal
-          list.add(new Point(other.x1, y1));
+          list.add(Point.create(other.x1, y1));
         } else if (x2 == x1) {
           // this is vertical
           int start = Math.max(y1, other.y1);
           int end = Math.min(y2, other.y2);
           for (int i = start; i <= end; i++) {
-            list.add(new Point(x1, i));
+            list.add(Point.create(x1, i));
           }
         } else {
           throw new IllegalStateException();
@@ -122,11 +103,11 @@ public class Puzzle3a {
           int start = Math.max(x1, other.x1);
           int end = Math.min(x2, other.x2);
           for (int i = start; i <= end; i++) {
-            list.add(new Point(i, y1));
+            list.add(Point.create(i, y1));
           }
         } else if (x2 == x1) {
           // this is vertical
-          list.add(new Point(x1, other.y1));
+          list.add(Point.create(x1, other.y1));
         } else {
           throw new IllegalStateException();
         }

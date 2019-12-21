@@ -161,23 +161,6 @@ public class Puzzle18a2 {
     }
   }
 
-  private static class Point {
-    private int x, y;
-
-    public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    public int getX() {
-      return x;
-    }
-
-    public int getY() {
-      return y;
-    }
-  }
-
   private static Optional<Integer> check(int[][] map, int[][] dist, int tx, int ty) {
     if (ty < 0 || ty >= map.length || tx < 0 || tx >= map[ty].length) {
       return Optional.empty();
@@ -225,7 +208,7 @@ public class Puzzle18a2 {
           dist[cy][cx - 1] = curDist;
 
           if (spot.get() == 1) {
-            queue.add(new Point(cx - 1, cy));
+            queue.add(Point.create(cx - 1, cy));
           } else {
             distances.put(origin, spot.get(), curDist);
           }
@@ -236,7 +219,7 @@ public class Puzzle18a2 {
           dist[cy][cx + 1] = curDist;
 
           if (spot.get() == 1) {
-            queue.add(new Point(cx + 1, cy));
+            queue.add(Point.create(cx + 1, cy));
           } else {
             distances.put(origin, spot.get(), curDist);
           }
@@ -247,7 +230,7 @@ public class Puzzle18a2 {
           dist[cy - 1][cx] = curDist;
 
           if (spot.get() == 1) {
-            queue.add(new Point(cx, cy - 1));
+            queue.add(Point.create(cx, cy - 1));
           } else {
             distances.put(origin, spot.get(), curDist);
           }
@@ -258,7 +241,7 @@ public class Puzzle18a2 {
           dist[cy + 1][cx] = curDist;
 
           if (spot.get() == 1) {
-            queue.add(new Point(cx, cy + 1));
+            queue.add(Point.create(cx, cy + 1));
           } else {
             distances.put(origin, spot.get(), curDist);
           }
@@ -274,7 +257,7 @@ public class Puzzle18a2 {
     for (int y = 0; y < map.length; y++) {
       for (int x = 0; x < map[y].length; x++) {
         if (map[y][x] != 1 && map[y][x] != -1) {
-          landmarks.put(map[y][x], new Point(x, y));
+          landmarks.put(map[y][x], Point.create(x, y));
         }
       }
     }

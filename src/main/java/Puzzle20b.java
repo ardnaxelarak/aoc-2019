@@ -41,15 +41,15 @@ public class Puzzle20b {
             String tag = map[y][x] + "" + map[y][x + 1];
             if (get(map, y, x - 1) == '.') {
               if (x > map[0].length / 2) {
-                teleports.put("O" + tag, new Point(x - 1, y));
+                teleports.put("O" + tag, Point.create(x - 1, y));
               } else {
-                teleports.put("I" + tag, new Point(x - 1, y));
+                teleports.put("I" + tag, Point.create(x - 1, y));
               }
             } else if (get(map, y, x + 2) == '.') {
               if (x > map[0].length / 2) {
-                teleports.put("I" + tag, new Point(x + 2, y));
+                teleports.put("I" + tag, Point.create(x + 2, y));
               } else {
-                teleports.put("O" + tag, new Point(x + 2, y));
+                teleports.put("O" + tag, Point.create(x + 2, y));
               }
             } else {
               throw new IllegalStateException();
@@ -58,15 +58,15 @@ public class Puzzle20b {
             String tag = map[y][x] + "" + map[y + 1][x];
             if (get(map, y - 1, x) == '.') {
               if (y > map.length / 2) {
-                teleports.put("O" + tag, new Point(x, y - 1));
+                teleports.put("O" + tag, Point.create(x, y - 1));
               } else {
-                teleports.put("I" + tag, new Point(x, y - 1));
+                teleports.put("I" + tag, Point.create(x, y - 1));
               }
             } else if (get(map, y + 2, x) == '.') {
               if (y > map.length / 2) {
-                teleports.put("I" + tag, new Point(x, y + 2));
+                teleports.put("I" + tag, Point.create(x, y + 2));
               } else {
-                teleports.put("O" + tag, new Point(x, y + 2));
+                teleports.put("O" + tag, Point.create(x, y + 2));
               }
             } else {
               throw new IllegalStateException();
@@ -168,45 +168,6 @@ public class Puzzle20b {
     }
   }
 
-  private static class Point {
-    private int x, y;
-
-    public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    public int getX() {
-      return x;
-    }
-
-    public int getY() {
-      return y;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (!(o instanceof Point)) {
-        return false;
-      }
-      Point p = (Point) o;
-      return p.x == x && p.y == y;
-    }
-
-    @Override
-    public int hashCode() {
-      int hash = 7;
-      hash = hash * 31 + y;
-      hash = hash * 31 + x;
-      return hash;
-    }
-
-    @Override
-    public String toString() {
-      return String.format("<x = %d, y = %d>", x, y);
-    }
-  }
-
   private static Table<String, String, Integer> getDistances(
       int[][] map, BiMap<String, Point> teleports) {
     BiMap<Point, String> teleportInverse = teleports.inverse();
@@ -241,22 +202,22 @@ public class Puzzle20b {
         if (check(map, dist, cx - 1, cy)) {
           int curDist = dist[cy][cx] + 1;
           dist[cy][cx - 1] = curDist;
-          queue.add(new Point(cx - 1, cy));
+          queue.add(Point.create(cx - 1, cy));
         }
         if (check(map, dist, cx + 1, cy)) {
           int curDist = dist[cy][cx] + 1;
           dist[cy][cx + 1] = curDist;
-          queue.add(new Point(cx + 1, cy));
+          queue.add(Point.create(cx + 1, cy));
         }
         if (check(map, dist, cx, cy - 1)) {
           int curDist = dist[cy][cx] + 1;
           dist[cy - 1][cx] = curDist;
-          queue.add(new Point(cx, cy - 1));
+          queue.add(Point.create(cx, cy - 1));
         }
         if (check(map, dist, cx, cy + 1)) {
           int curDist = dist[cy][cx] + 1;
           dist[cy + 1][cx] = curDist;
-          queue.add(new Point(cx, cy + 1));
+          queue.add(Point.create(cx, cy + 1));
         }
       }
     }

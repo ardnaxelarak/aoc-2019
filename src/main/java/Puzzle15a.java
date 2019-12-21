@@ -44,23 +44,6 @@ public class Puzzle15a {
     System.out.println(dh.getDistance(0, 0, oxy.getX(), oxy.getY()));
   }
 
-  private static class Point {
-    private int x, y;
-
-    public Point(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    public int getX() {
-      return x;
-    }
-
-    public int getY() {
-      return y;
-    }
-  }
-
   private static class DroidHelper {
     private BufferedIO io;
     private final Table<Integer, Integer, Integer> surface;
@@ -151,7 +134,7 @@ public class Puzzle15a {
       if (!point.isPresent()) {
         throw new IllegalStateException();
       }
-      return new Point(point.get().getRowKey(), point.get().getColumnKey());
+      return Point.create(point.get().getRowKey(), point.get().getColumnKey());
     }
 
     private boolean available(int x, int y) {
@@ -167,7 +150,7 @@ public class Puzzle15a {
       List<Point> queue = new ArrayList<>();
 
       distance.put(x1, y1, 0);
-      queue.add(new Point(x1, y1));
+      queue.add(Point.create(x1, y1));
       while (!queue.isEmpty()) {
         Point p = queue.remove(0);
         int x = p.getX();
@@ -175,19 +158,19 @@ public class Puzzle15a {
         int base = distance.get(x, y);
         if (surface.get(x - 1, y) > 0 && !distance.contains(x - 1, y)) {
           distance.put(x - 1, y, base + 1);
-          queue.add(new Point(x - 1, y));
+          queue.add(Point.create(x - 1, y));
         }
         if (surface.get(x + 1, y) > 0 && !distance.contains(x + 1, y)) {
           distance.put(x + 1, y, base + 1);
-          queue.add(new Point(x + 1, y));
+          queue.add(Point.create(x + 1, y));
         }
         if (surface.get(x, y - 1) > 0 && !distance.contains(x, y - 1)) {
           distance.put(x, y - 1, base + 1);
-          queue.add(new Point(x, y - 1));
+          queue.add(Point.create(x, y - 1));
         }
         if (surface.get(x, y + 1) > 0 && !distance.contains(x, y + 1)) {
           distance.put(x, y + 1, base + 1);
-          queue.add(new Point(x, y + 1));
+          queue.add(Point.create(x, y + 1));
         }
       }
 
