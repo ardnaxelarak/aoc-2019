@@ -35,6 +35,11 @@ public class Intcode {
     return new Intcode(memory);
   }
 
+  /** Warning: This is a destructive operation! */
+  public void modifyMemory(int location, long newValue) {
+    originalMemory[location] = newValue;
+  }
+
   public long[] execute() {
     return execute(DEFAULT_IO);
   }
