@@ -1,18 +1,17 @@
-import com.google.common.collect.ArrayListMultimap;
+import com.ardnaxelarak.util.graph.Edge;
+import com.ardnaxelarak.util.graph.EdgeProvider;
+import com.ardnaxelarak.util.graph.Graphs;
 import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
 import java.util.Scanner;
-import java.util.stream.Stream;
+import java.util.Set;
 
 public class Puzzle20b {
   public static void main(String[] args) {
@@ -27,12 +26,7 @@ public class Puzzle20b {
             .map(String::toCharArray)
             .toArray(char[][]::new);
 
-    int[][] canTravel =
-        lines.stream()
-            .map(line -> line.chars().map(Puzzle20b::getValue).toArray())
-            .toArray(int[][]::new);
-
-    BiMap<String, Point> teleports = HashBiMap.create();
+    BiMap<String, Point> connections = HashBiMap.create();
 
     for (int y = 0; y < map.length; y++) {
       for (int x = 0; x < map[y].length; x++) {
@@ -41,15 +35,15 @@ public class Puzzle20b {
             String tag = map[y][x] + "" + map[y][x + 1];
             if (get(map, y, x - 1) == '.') {
               if (x > map[0].length / 2) {
-                teleports.put("O" + tag, Point.create(x - 1, y));
+                connections.put("O" + tag, Point.create(x - 1, y));
               } else {
-                teleports.put("I" + tag, Point.create(x - 1, y));
+                connections.put("I" + tag, Point.create(x - 1, y));
               }
             } else if (get(map, y, x + 2) == '.') {
               if (x > map[0].length / 2) {
-                teleports.put("I" + tag, Point.create(x + 2, y));
+                connections.put("I" + tag, Point.create(x + 2, y));
               } else {
-                teleports.put("O" + tag, Point.create(x + 2, y));
+                connections.put("O" + tag, Point.create(x + 2, y));
               }
             } else {
               throw new IllegalStateException();
@@ -58,15 +52,15 @@ public class Puzzle20b {
             String tag = map[y][x] + "" + map[y + 1][x];
             if (get(map, y - 1, x) == '.') {
               if (y > map.length / 2) {
-                teleports.put("O" + tag, Point.create(x, y - 1));
+                connections.put("O" + tag, Point.create(x, y - 1));
               } else {
-                teleports.put("I" + tag, Point.create(x, y - 1));
+                connections.put("I" + tag, Point.create(x, y - 1));
               }
             } else if (get(map, y + 2, x) == '.') {
               if (y > map.length / 2) {
-                teleports.put("I" + tag, Point.create(x, y + 2));
+                connections.put("I" + tag, Point.create(x, y + 2));
               } else {
-                teleports.put("O" + tag, Point.create(x, y + 2));
+                connections.put("O" + tag, Point.create(x, y + 2));
               }
             } else {
               throw new IllegalStateException();
@@ -76,61 +70,24 @@ public class Puzzle20b {
       }
     }
 
-    Table<String, String, Integer> distances = getDistances(canTravel, teleports);
+    EdgeProvider<Point> edges = new P20bEdgeProvider(map);
+    Table<Point, Point, Long> pointDistances =
+        Graphs.getAllDistances(edges, connections.values());
 
-    String start = "OAA0";
-    Map<String, Integer> visited = new HashMap<>();
-    Map<String, Integer> unvisited = new HashMap<>();
-    unvisited.put(start, 0);
+    BiMap<Point, String> labels = connections.inverse();
+    Table<String, String, Long> distances =
+        pointDistances.cellSet().stream()
+            .filter(cell -> labels.containsKey(cell.getRowKey()))
+            .filter(cell -> labels.containsKey(cell.getColumnKey()))
+            .collect(
+                ImmutableTable.toImmutableTable(
+                    cell -> labels.get(cell.getRowKey()),
+                    cell -> labels.get(cell.getColumnKey()),
+                    cell -> cell.getValue()));
 
-    while (!unvisited.isEmpty()) {
-      String loc =
-          unvisited.entrySet().stream()
-              .min(Comparator.comparingInt(Map.Entry::getValue)).get().getKey();
+    EdgeProvider<String> levelEdges = new P20bLevelEdgeProvider(distances);
 
-      String baseLoc = loc.substring(0, 3);
-      int level = Integer.parseInt(loc.substring(3));
-
-      int baseDist = unvisited.get(loc);
-      visited.put(loc, baseDist);
-      unvisited.remove(loc);
-
-      if (loc.equals("IZZ-1")) {
-        break;
-      }
-
-      for (String newLoc : distances.columnKeySet()) {
-        if (!distances.contains(baseLoc, newLoc)) {
-          continue;
-        }
-
-        if (newLoc.charAt(0) == 'O') {
-          if (level > 0) {
-            if (newLoc.equals("OAA") || newLoc.equals("OZZ")) {
-              continue;
-            }
-          } else {
-            if (!newLoc.equals("OAA") && !newLoc.equals("OZZ")) {
-              continue;
-            }
-          }
-        }
-
-        String fullLoc = otherSide(newLoc + level);
-
-        if (visited.containsKey(fullLoc)) {
-          continue;
-        }
-
-        int dist = baseDist + 1 + distances.get(baseLoc, newLoc);
-        
-        if (!unvisited.containsKey(fullLoc) || unvisited.get(fullLoc) > dist) {
-          unvisited.put(fullLoc, dist);
-        }
-      }
-    }
-
-    System.out.println(visited.get("IZZ-1") - 1);
+    System.out.println(Graphs.getDistance(levelEdges, "OAA0", "OZZ0"));
   }
 
   private static String otherSide(String loc) {
@@ -160,80 +117,67 @@ public class Puzzle20b {
     return c >= 'A' && c <= 'Z';
   }
 
-  private static int getValue(int c) {
-    if (c == '.') {
-      return 1;
-    } else {
-      return 0;
+  private static class P20bEdgeProvider implements EdgeProvider<Point> {
+    private char[][] map;
+
+    public P20bEdgeProvider(char[][] map) {
+      this.map = map;
+    }
+
+    public Iterable<Edge<Point>> getEdges(Point origin) {
+      Set<Edge<Point>> edges = new HashSet<>();
+      int x = origin.getX();
+      int y = origin.getY();
+      if (x > 0 && map[y][x - 1] == '.') {
+        edges.add(Edge.create(Point.create(x - 1, y), 1));
+      }
+      if (y > 0 && map[y - 1][x] == '.') {
+        edges.add(Edge.create(Point.create(x, y - 1), 1));
+      }
+      if (x < map[y].length - 1 && map[y][x + 1] == '.') {
+        edges.add(Edge.create(Point.create(x + 1, y), 1));
+      }
+      if (y < map.length - 1 && map[y + 1][x] == '.') {
+        edges.add(Edge.create(Point.create(x, y + 1), 1));
+      }
+      return edges;
     }
   }
 
-  private static Table<String, String, Integer> getDistances(
-      int[][] map, BiMap<String, Point> teleports) {
-    BiMap<Point, String> teleportInverse = teleports.inverse();
-    Table<String, String, Integer> distances = HashBasedTable.create();
+  private static class P20bLevelEdgeProvider implements EdgeProvider<String> {
+    private ImmutableSetMultimap<String, Edge<String>> distances;
 
-    int[][] dist = new int[map.length][map[0].length];
-
-    for (Map.Entry<String, Point> entry : teleports.entrySet()) {
-      Point start = entry.getValue();
-      int curX = start.getX();
-      int curY = start.getY();
-
-      for (int y = 0; y < dist.length; y++) {
-        Arrays.fill(dist[y], Integer.MAX_VALUE);
+    public P20bLevelEdgeProvider(Table<String, String, Long> distances) {
+      ImmutableSetMultimap.Builder<String, Edge<String>> builder =
+          ImmutableSetMultimap.builder();
+      Set<Table.Cell<String, String, Long>> cells = distances.cellSet();
+      for (Table.Cell<String, String, Long> cell : cells) {
+        builder.put(cell.getRowKey(), Edge.create(cell.getColumnKey(), cell.getValue()));
       }
+      this.distances = builder.build();
+    }
 
-      List<Point> queue = new ArrayList<>();
-      dist[curY][curX] = 0;
-      queue.add(start);
-
-      Point cur;
-
-      while (!queue.isEmpty()) {
-        cur = queue.remove(0);
-        int cx = cur.getX();
-        int cy = cur.getY();
-
-        if (!cur.equals(start) && teleportInverse.containsKey(cur)) {
-          distances.put(entry.getKey(), teleportInverse.get(cur), dist[cy][cx]);
+    public Iterable<Edge<String>> getEdges(String origin) {
+      Set<Edge<String>> edges = new HashSet<>();
+      String baseLoc = origin.substring(0, 3);
+      int level = Integer.parseInt(origin.substring(3));
+      for (Edge<String> edge : distances.get(baseLoc)) {
+        String newLoc = edge.getValue();
+        if (newLoc.charAt(0) == 'O') {
+          if (level == 0) {
+            if (!newLoc.equals("OAA") && !newLoc.equals("OZZ")) {
+              continue;
+            }
+          } else {
+            if (newLoc.equals("OAA") || newLoc.equals("OZZ")) {
+              continue;
+            }
+          }
         }
-
-        if (check(map, dist, cx - 1, cy)) {
-          int curDist = dist[cy][cx] + 1;
-          dist[cy][cx - 1] = curDist;
-          queue.add(Point.create(cx - 1, cy));
-        }
-        if (check(map, dist, cx + 1, cy)) {
-          int curDist = dist[cy][cx] + 1;
-          dist[cy][cx + 1] = curDist;
-          queue.add(Point.create(cx + 1, cy));
-        }
-        if (check(map, dist, cx, cy - 1)) {
-          int curDist = dist[cy][cx] + 1;
-          dist[cy - 1][cx] = curDist;
-          queue.add(Point.create(cx, cy - 1));
-        }
-        if (check(map, dist, cx, cy + 1)) {
-          int curDist = dist[cy][cx] + 1;
-          dist[cy + 1][cx] = curDist;
-          queue.add(Point.create(cx, cy + 1));
-        }
+        edges.add(Edge.create(edge.getValue() + level, edge.getCost()));
       }
+      edges.add(Edge.create(otherSide(origin), 1));
+      return edges;
     }
-
-    return distances;
-  }
-
-  private static boolean check(int[][] map, int[][] dist, int tx, int ty) {
-    if (ty < 0 || ty >= map.length || tx < 0 || tx >= map[ty].length) {
-      return false;
-    }
-
-    if (dist[ty][tx] < Integer.MAX_VALUE) {
-      return false;
-    }
-
-    return map[ty][tx] > 0;
   }
 }

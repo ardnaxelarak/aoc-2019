@@ -1,13 +1,14 @@
+import com.ardnaxelarak.util.graph.Edge;
+import com.ardnaxelarak.util.graph.EdgeProvider;
+import com.ardnaxelarak.util.graph.Graphs;
 import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
 import java.util.Scanner;
-import java.util.stream.Stream;
+import java.util.Set;
 
 public class Puzzle20a {
   public static void main(String[] args) {
@@ -21,11 +22,6 @@ public class Puzzle20a {
         lines.stream()
             .map(String::toCharArray)
             .toArray(char[][]::new);
-
-    int[][] canTravel =
-        lines.stream()
-            .map(line -> line.chars().map(Puzzle20a::getValue).toArray())
-            .toArray(int[][]::new);
 
     ArrayListMultimap<String, Point> teleports = ArrayListMultimap.create();
 
@@ -67,9 +63,10 @@ public class Puzzle20a {
       }
     }
 
+    EdgeProvider<Point> edges = new P20aEdgeProvider(map, points);
     Point start = teleports.get("AA").get(0);
     Point end = teleports.get("ZZ").get(0);
-    System.out.println(getDistance(canTravel, points, start, end));
+    System.out.println(Graphs.getDistance(edges, start, end));
   }
 
   private static char get(char[][] map, int y, int x) {
@@ -88,78 +85,35 @@ public class Puzzle20a {
     return c >= 'A' && c <= 'Z';
   }
 
-  private static int getValue(int c) {
-    if (c == '.') {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
+  private static class P20aEdgeProvider implements EdgeProvider<Point> {
+    private char[][] map;
+    private Map<Point, Point> teleports;
 
-  private static int getDistance(
-      int[][] map, Map<Point, Point> teleports, Point start, Point end) {
-    int curX = start.getX();
-    int curY = start.getY();
-
-    int[][] dist = new int[map.length][map[0].length];
-    for (int y = 0; y < dist.length; y++) {
-      Arrays.fill(dist[y], Integer.MAX_VALUE);
+    public P20aEdgeProvider(char[][] map, Map<Point, Point> teleports) {
+      this.map = map;
+      this.teleports = teleports;
     }
 
-    List<Point> queue = new ArrayList<>();
-    dist[curY][curX] = 0;
-    queue.add(start);
-
-    Point cur;
-
-    while (!queue.isEmpty()) {
-      cur = queue.remove(0);
-      int cx = cur.getX();
-      int cy = cur.getY();
-
-      if (check(map, dist, cx - 1, cy)) {
-        int curDist = dist[cy][cx] + 1;
-        dist[cy][cx - 1] = curDist;
-        queue.add(Point.create(cx - 1, cy));
+    public Iterable<Edge<Point>> getEdges(Point origin) {
+      Set<Edge<Point>> edges = new HashSet<>();
+      int x = origin.getX();
+      int y = origin.getY();
+      if (x > 0 && map[y][x - 1] == '.') {
+        edges.add(Edge.create(Point.create(x - 1, y), 1));
       }
-      if (check(map, dist, cx + 1, cy)) {
-        int curDist = dist[cy][cx] + 1;
-        dist[cy][cx + 1] = curDist;
-        queue.add(Point.create(cx + 1, cy));
+      if (y > 0 && map[y - 1][x] == '.') {
+        edges.add(Edge.create(Point.create(x, y - 1), 1));
       }
-      if (check(map, dist, cx, cy - 1)) {
-        int curDist = dist[cy][cx] + 1;
-        dist[cy - 1][cx] = curDist;
-        queue.add(Point.create(cx, cy - 1));
+      if (x < map[y].length - 1 && map[y][x + 1] == '.') {
+        edges.add(Edge.create(Point.create(x + 1, y), 1));
       }
-      if (check(map, dist, cx, cy + 1)) {
-        int curDist = dist[cy][cx] + 1;
-        dist[cy + 1][cx] = curDist;
-        queue.add(Point.create(cx, cy + 1));
+      if (y < map.length - 1 && map[y + 1][x] == '.') {
+        edges.add(Edge.create(Point.create(x, y + 1), 1));
       }
-      if (teleports.containsKey(cur)) {
-        Point tp = teleports.get(cur);
-        int tx = tp.getX();
-        int ty = tp.getY();
-        if (dist[ty][tx] == Integer.MAX_VALUE) {
-          dist[ty][tx] = dist[cy][cx] + 1;
-          queue.add(Point.create(tx, ty));
-        }
+      if (teleports.containsKey(origin)) {
+        edges.add(Edge.create(teleports.get(origin), 1));
       }
+      return edges;
     }
-
-    return dist[end.getY()][end.getX()];
-  }
-
-  private static boolean check(int[][] map, int[][] dist, int tx, int ty) {
-    if (ty < 0 || ty >= map.length || tx < 0 || tx >= map[ty].length) {
-      return false;
-    }
-
-    if (dist[ty][tx] < Integer.MAX_VALUE) {
-      return false;
-    }
-
-    return map[ty][tx] > 0;
   }
 }
