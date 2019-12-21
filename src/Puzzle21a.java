@@ -10,7 +10,7 @@ public class Puzzle21a {
         + "OR T J\n"
         + "WALK\n";
 
-    SpringdroidIO io = new SpringdroidIO(springScript);
+    AsciiIO io = new AsciiIO(true, springScript);
     Intcode computer = Intcode.fromStdIn();
     computer.execute(io);
   }

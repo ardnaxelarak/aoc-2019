@@ -24,7 +24,7 @@ public class Puzzle21b {
         + "AND D J\n"
         + "RUN\n";
 
-    SpringdroidIO io = new SpringdroidIO(springScript);
+    AsciiIO io = new AsciiIO(true, springScript);
     Intcode computer = Intcode.fromStdIn();
     computer.execute(io);
   }
