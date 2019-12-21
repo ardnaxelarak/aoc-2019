@@ -2,13 +2,8 @@ public class RunnableIntcode implements Runnable {
   private final Intcode computer;
   private final IntcodeIO io;
 
-  public RunnableIntcode(long[] memory, IntcodeIO io) {
-    this.computer = new Intcode(memory);
-    this.io = io;
-  }
-
-  public RunnableIntcode(int[] memory, IntcodeIO io) {
-    this.computer = new Intcode(memory);
+  public RunnableIntcode(Intcode computer, IntcodeIO io) {
+    this.computer = computer.clone();
     this.io = io;
   }
 

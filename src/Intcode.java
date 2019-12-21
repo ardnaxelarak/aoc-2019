@@ -35,6 +35,10 @@ public class Intcode {
     return new Intcode(memory);
   }
 
+  public Intcode clone() {
+    return new Intcode(originalMemory);
+  }
+
   /** Warning: This is a destructive operation! */
   public void modifyMemory(int location, long newValue) {
     originalMemory[location] = newValue;

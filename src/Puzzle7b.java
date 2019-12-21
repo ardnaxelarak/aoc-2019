@@ -3,20 +3,17 @@ import java.util.stream.Stream;
 
 public class Puzzle7b {
   public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
-    String program = sc.nextLine();
-    String[] pieces = program.split(",");
-    int[] memory = Stream.of(pieces).mapToInt(Integer::parseInt).toArray();
+    Intcode computer = Intcode.fromStdIn();
 
     Integer[] phases = new Integer[] {5, 6, 7, 8, 9};
 
-    P7bEmitter emit = new P7bEmitter(memory);
+    P7bEmitter emit = new P7bEmitter(computer);
     Permutations.listPermutations(phases, emit);
 
     System.out.println(emit.getMaxThrust());
   }
 
-  private static long getThruster(int[] memory, int[] settings) throws InterruptedException {
+  private static long getThruster(Intcode computer, int[] settings) throws InterruptedException {
     if (settings.length != 5) {
       throw new IllegalArgumentException(
           "Expected 5 phase settings but got " + settings.length);
@@ -32,11 +29,11 @@ public class Puzzle7b {
       ios[i].setAfter(ios[(i + 1) % 5]);
     }
 
-    RunnableIntcode[] computers = new RunnableIntcode[5];
+    RunnableIntcode[] runnableComputers = new RunnableIntcode[5];
     Thread[] threads = new Thread[5];
     for (int i = 0; i < 5; i++) {
-      computers[i] = new RunnableIntcode(memory, ios[i]);
-      threads[i] = new Thread(computers[i]);
+      runnableComputers[i] = new RunnableIntcode(computer, ios[i]);
+      threads[i] = new Thread(runnableComputers[i]);
       threads[i].start();
     }
 
@@ -48,17 +45,17 @@ public class Puzzle7b {
   }
 
   private static class P7bEmitter implements Permutations.PermutationEmitter<Integer> {
-    private int[] memory;
+    private Intcode computer;
     private long maxThrust = Long.MIN_VALUE;
 
-    public P7bEmitter(int[] memory) {
-      this.memory = memory;
+    public P7bEmitter(Intcode computer) {
+      this.computer = computer;
     }
 
     public void emit(Integer[] array) {
       int[] prim = Stream.of(array).mapToInt(Integer::intValue).toArray();
       try {
-        long thrust = getThruster(memory, prim);
+        long thrust = getThruster(computer, prim);
         if (thrust > maxThrust) {
           maxThrust = thrust;
         }

@@ -4,22 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.stream.Stream;
 
 public class Puzzle15b {
   public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
-    String program = sc.nextLine();
-    String[] pieces = program.split(",");
-    long[] memory = Stream.of(pieces).mapToLong(Long::parseLong).toArray();
+    Intcode computer = Intcode.fromStdIn();
 
-    RD15b io = new RD15b();
+    BufferedIO io = new BufferedIO();
     DroidHelper dh = new DroidHelper(io);
-    RunnableIntcode computer = new RunnableIntcode(memory, io);
-    Thread thread = new Thread(computer);
+    RunnableIntcode runnableComputer = new RunnableIntcode(computer, io);
+    Thread thread = new Thread(runnableComputer);
     thread.start();
 
     Random rand = new Random();
@@ -69,59 +62,12 @@ public class Puzzle15b {
     }
   }
 
-  private static class RD15b implements IntcodeIO {
-    private final BlockingQueue<Integer> inputBuffer = new ArrayBlockingQueue<>(10);
-    private final BlockingQueue<Integer> outputBuffer = new ArrayBlockingQueue<>(10);
-
-    public RD15b() {}
-
-    public long input() {
-      synchronized (inputBuffer) {
-        Integer next;
-        while ((next = inputBuffer.poll()) == null) {
-          try {
-            inputBuffer.wait();
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-        }
-        return next;
-      }
-    }
-
-    public void output(long value) {
-      synchronized (outputBuffer) {
-        outputBuffer.add((int) value);
-        outputBuffer.notify();
-      }
-    }
-
-    public int sendCommand(int value) {
-      synchronized (inputBuffer) {
-        inputBuffer.add(value);
-        inputBuffer.notify();
-      }
-
-      synchronized (outputBuffer) {
-        Integer next;
-        while ((next = outputBuffer.poll()) == null) {
-          try {
-            outputBuffer.wait();
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-        }
-        return next;
-      }
-    }
-  }
-
   private static class DroidHelper {
-    private RD15b io;
+    private BufferedIO io;
     private final Table<Integer, Integer, Integer> surface;
     private int curX, curY;
 
-    public DroidHelper(RD15b io) {
+    public DroidHelper(BufferedIO io) {
       this.io = io;
       curX = 0;
       curY = 0;
