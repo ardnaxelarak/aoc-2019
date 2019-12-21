@@ -1,18 +1,5 @@
-import com.google.common.base.Joiner;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.stream.Stream;
-
 public class Puzzle21b {
   public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
-    String program = sc.nextLine();
-    String[] pieces = program.split(",");
-    long[] memory = Stream.of(pieces).mapToLong(Long::parseLong).toArray();
-
     /*
      * If not D, don't jump.
      * Otherwise, if not A, jump.
@@ -23,44 +10,22 @@ public class Puzzle21b {
      * Otherwise, if not H, don't jump.
      * Otherwise, jump.
      */
-    List<String> springScript = new ArrayList<>();
-    springScript.add("OR H J");
-    springScript.add("NOT F T");
-    springScript.add("OR T J");
-    springScript.add("NOT C T");
-    springScript.add("AND T J");
-    springScript.add("NOT B T");
-    springScript.add("OR T J");
-    springScript.add("OR E J");
-    springScript.add("NOT A T");
-    springScript.add("OR T J");
-    springScript.add("AND D J");
-    springScript.add("RUN");
+    String springScript = 
+        "OR H J\n"
+        + "NOT F T\n"
+        + "OR T J\n"
+        + "NOT C T\n"
+        + "AND T J\n"
+        + "NOT B T\n"
+        + "OR T J\n"
+        + "OR E J\n"
+        + "NOT A T\n"
+        + "OR T J\n"
+        + "AND D J\n"
+        + "RUN\n";
 
-    IO21b io = new IO21b(springScript);
-    Intcode computer = new Intcode(memory);
+    SpringdroidIO io = new SpringdroidIO(springScript);
+    Intcode computer = Intcode.fromStdIn();
     computer.execute(io);
-  }
-
-  private static class IO21b implements IntcodeIO {
-    private char[] program;
-    private int index = 0;
-
-    public IO21b(List<String> program) {
-      Joiner joiner = Joiner.on('\n');
-      this.program = (joiner.join(program) + "\n").toCharArray();
-    }
-
-    public long input() {
-      return program[index++];
-    }
-
-    public void output(long value) {
-      if (value > 127) {
-        System.out.println(value);
-      } else {
-        System.out.print((char) value);
-      }
-    }
   }
 }

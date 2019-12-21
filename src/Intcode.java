@@ -1,5 +1,7 @@
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Scanner;
+import java.util.stream.Stream;
 
 public class Intcode {
   private static final boolean DEBUG = false;
@@ -22,6 +24,14 @@ public class Intcode {
 
   public Intcode(long[] memory) {
     this.memory = Arrays.copyOf(memory, memory.length * 10);
+  }
+
+  public static Intcode fromStdIn() {
+    Scanner sc = new Scanner(System.in);
+    String program = sc.nextLine();
+    String[] pieces = program.split(",");
+    long[] memory = Stream.of(pieces).mapToLong(Long::parseLong).toArray();
+    return new Intcode(memory);
   }
 
   public long[] execute() {
