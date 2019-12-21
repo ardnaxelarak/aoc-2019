@@ -1,4 +1,3 @@
-import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class Puzzle7b {
@@ -13,7 +12,8 @@ public class Puzzle7b {
     System.out.println(emit.getMaxThrust());
   }
 
-  private static long getThruster(Intcode computer, int[] settings) throws InterruptedException {
+  private static long getThruster(Intcode computer, int[] settings)
+      throws InterruptedException {
     if (settings.length != 5) {
       throw new IllegalArgumentException(
           "Expected 5 phase settings but got " + settings.length);
