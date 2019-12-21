@@ -1,17 +1,10 @@
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import java.util.Scanner;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class Puzzle13a {
   public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
-    String program = sc.nextLine();
-    String[] pieces = program.split(",");
-    long[] memory = Stream.of(pieces).mapToLong(Long::parseLong).toArray();
-
-    Intcode computer = new Intcode(memory);
+    Intcode computer = Intcode.fromStdIn();
     AC13a io = new AC13a();
     computer.execute(io);
     System.out.println(io.getBlocks());

@@ -5,24 +5,17 @@ import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Puzzle13b {
   public static void main(String[] args) {
-    Scanner sc = new Scanner(System.in);
-    String program = sc.nextLine();
-    String[] pieces = program.split(",");
-    long[] memory = Stream.of(pieces).mapToLong(Long::parseLong).toArray();
-    memory[0] = 2;
-
-    Intcode computer = new Intcode(memory);
+    Intcode computer = Intcode.fromStdIn();
+    computer.modifyMemory(0, 2);
     AC13b io = new AC13b();
     computer.execute(io);
   }
