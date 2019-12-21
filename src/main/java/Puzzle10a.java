@@ -10,10 +10,7 @@ public class Puzzle10a {
     while (sc.hasNextLine()) {
       lines.add(sc.nextLine());
     }
-    boolean[][] asteroids = new boolean[lines.size()][];
-    for (int i = 0; i < lines.size(); i++) {
-      asteroids[i] = getRow(lines.get(i));
-    }
+    boolean[][] asteroids = lines.stream().map(Puzzle10a::getRow).toArray(boolean[][]::new);
 
     int maxCount = 0;
     for (int y1 = 0; y1 < asteroids.length; y1++) {
@@ -21,7 +18,6 @@ public class Puzzle10a {
         if (!asteroids[y1][x1]) {
           continue;
         }
-        // System.err.printf("(%d, %d)\n", x1, y1);
 
         int count = 0;
         for (int y2 = 0; y2 < asteroids.length; y2++) {
@@ -35,13 +31,10 @@ public class Puzzle10a {
 
             if (canSee(asteroids, x1, y1, x2, y2)) {
               count++;
-            } else {
-              // System.err.printf("--> can't see (%d, %d)\n", x2, y2);
             }
           }
         }
 
-        // System.err.printf("----> %d total can see\n", count);
         maxCount = Math.max(count, maxCount);
       }
     }

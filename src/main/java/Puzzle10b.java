@@ -13,10 +13,7 @@ public class Puzzle10b {
     while (sc.hasNextLine()) {
       lines.add(sc.nextLine());
     }
-    boolean[][] asteroids = new boolean[lines.size()][];
-    for (int i = 0; i < lines.size(); i++) {
-      asteroids[i] = getRow(lines.get(i));
-    }
+    boolean[][] asteroids = lines.stream().map(Puzzle10b::getRow).toArray(boolean[][]::new);
 
     // determine best location
     int maxCount = 0;
@@ -95,13 +92,6 @@ public class Puzzle10b {
 
     List<Table.Cell<Integer, Integer, Double>> ordered = new ArrayList<>(angles.cellSet());
     ordered.sort(Comparator.comparing(Table.Cell::getValue));
-
-    /*
-    int index = 1;
-    for (Table.Cell<Integer, Integer, Double> cell : ordered) {
-      System.err.printf("%3d: (%d, %d)\n", index++, cell.getColumnKey(), cell.getRowKey());
-    }
-    */
 
     Table.Cell<Integer, Integer, Double> num200 = ordered.get(199);
     System.out.println(num200.getColumnKey() * 100 + num200.getRowKey());
