@@ -1,15 +1,7 @@
-import com.ardnaxelarak.util.graph.Edge;
-import com.ardnaxelarak.util.graph.EdgeProvider;
-import com.ardnaxelarak.util.graph.Graphs;
-import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
 public class Puzzle22a {
   public static void main(String[] args) {
