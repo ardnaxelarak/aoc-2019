@@ -23,12 +23,15 @@ public class Intcode {
     this.originalMemory = Arrays.copyOf(memory, memory.length * 10);
   }
 
-  public static Intcode fromStdIn() {
-    Scanner sc = new Scanner(System.in);
+  public static Intcode from(Scanner sc) {
     String program = sc.nextLine();
     String[] pieces = program.split(",");
     long[] memory = Stream.of(pieces).mapToLong(Long::parseLong).toArray();
     return new Intcode(memory);
+  }
+
+  public static Intcode fromStdIn() {
+    return from(new Scanner(System.in));
   }
 
   public Intcode clone() {
